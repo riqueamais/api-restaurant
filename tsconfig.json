@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    /* Projects */
+
+    /* Language and Environment */
+    "target": "ES2023",
+    "lib": ["ES2023"],
+
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    /* Modules */
+    "module": "nodenext",
+
+    /* JavaScript Support */
+
+    /* Emit */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+
+    /* Completeness */
+    "skipLibCheck": true
+  }
+}
