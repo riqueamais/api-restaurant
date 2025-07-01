@@ -1,4 +1,5 @@
 import { knex } from "@/database/knex";
+import { AppError } from "@/utils/AppError";
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 
@@ -12,7 +13,7 @@ class ProductsController {
         .whereLike("name", `%${name ?? ""}%`);
 
       if (!products || products.length === 0) {
-        return res.status(404).json({ message: "Products not found" });
+        throw new AppError("Products not found", 404);
       }
 
       res.status(200).json(products);
@@ -23,14 +24,20 @@ class ProductsController {
 
   async indexById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = z
+        .string()
+        .transform((value) => Number(value))
+        .refine((value) => !isNaN(value), {
+          message: "Invalid ID",
+        })
+        .parse(req.params.id);
 
       const product = await knex<ProductRepository>("products")
         .select()
         .where({ id });
 
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        throw new AppError("Product not found", 404);
       }
 
       res.status(200).json(product);
@@ -57,6 +64,67 @@ class ProductsController {
       await knex<ProductRepository>("products").insert({ name, price });
 
       res.status(201).json({ message: "Product created successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = z
+        .string()
+        .transform((value) => Number(value))
+        .refine((value) => !isNaN(value), {
+          message: "Invalid ID",
+        })
+        .parse(req.params.id);
+
+      const bodySchema = z.object({
+        name: z
+          .string({ required_error: "name is required!" })
+          .trim()
+          .min(6, "name must be at least 6 characters long")
+          .max(100, "name must be at most 100 characters long"),
+        price: z
+          .number({ required_error: "price is required!" })
+          .gt(0, "price must be greater than 0"),
+      });
+
+      const { name, price } = bodySchema.parse(req.body);
+
+      const product = await knex<ProductRepository>("products")
+        .update({ name, price, updated_at: knex.fn.now() })
+        .where({ id });
+
+      if (!product) {
+        throw new AppError("Product not found", 404);
+      }
+
+      res.status(200).json({ message: "Product updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = z
+        .string()
+        .transform((value) => Number(value))
+        .refine((value) => !isNaN(value), {
+          message: "Invalid ID",
+        })
+        .parse(req.params.id);
+
+      const product = await knex<ProductRepository>("products")
+        .delete()
+        .where({ id });
+
+      if (!product) {
+        throw new AppError("Product not found", 404);
+      }
+
+      res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
       next(error);
     }
