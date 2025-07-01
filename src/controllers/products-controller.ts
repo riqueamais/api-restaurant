@@ -34,7 +34,7 @@ class ProductsController {
 
       const product = await knex<ProductRepository>("products")
         .select()
-        .where({ id });
+        .where({ id }).first();
 
       if (!product) {
         throw new AppError("Product not found", 404);
@@ -94,7 +94,7 @@ class ProductsController {
 
       const product = await knex<ProductRepository>("products")
         .update({ name, price, updated_at: knex.fn.now() })
-        .where({ id });
+        .where({ id }).first();
 
       if (!product) {
         throw new AppError("Product not found", 404);
@@ -118,7 +118,7 @@ class ProductsController {
 
       const product = await knex<ProductRepository>("products")
         .delete()
-        .where({ id });
+        .where({ id }).first();
 
       if (!product) {
         throw new AppError("Product not found", 404);
