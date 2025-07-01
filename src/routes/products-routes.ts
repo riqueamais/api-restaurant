@@ -5,6 +5,7 @@ const productsRoutes = Router();
 const productsController = new ProductsController();
 
 productsRoutes.get("/", productsController.index);
+productsRoutes.get("/:id", productsController.indexById);
 productsRoutes.post("/", productsController.create);
 
 export { productsRoutes };
