@@ -18,5 +18,5 @@ export function errorHandling(
       .json({ message: "validation error", issues: error.format() });
   }
 
-  return res.status(500).json({ message: "Internal Server Error" });
+  return res.status(500).json({ message: error.message });
 }
