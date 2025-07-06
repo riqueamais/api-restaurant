@@ -59,7 +59,7 @@ class TablesSessionsController {
         .first();
 
       if (!session) {
-        throw new AppError("session table not found", 404);
+        throw new AppError("session table not found");
       }
 
       if (session.closed_at) {
